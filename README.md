@@ -13,16 +13,15 @@ Navikat is a self-hosted web application that fetches music tracks and playlists
    ```
 
 2. **Configure environment:**
-   Copy `.env.example` to `.env`. Add your [Spotify Developer API keys](https://developer.spotify.com/dashboard) if you want Spotify search enabled, and set `ENABLE_AUTH=true` with a secure `AUTH_PASSWORD` if you want password protection.
+   Copy `.env.example` to `.env` and fill in your values (see [Configuration](#-configuration) below for what each variable does).
    ```bash
    cp .env.example .env
    ```
 
-3. **Configure your music volume:**
-   In `docker-compose.yml`, edit the `volumes:` line to point to your real music directory on the host (the left side before the colon is your host folder path, while the right side `/music` is the container path and must not be changed).
-   ```yaml
-   volumes:
-     - /path/to/your/actual/music/folder:/music
+3. **Set your music library path:**
+   In `.env`, set `MUSIC_HOST_PATH` to the real folder on your host machine where your music library lives — no need to edit `docker-compose.yml` at all, it already reads this variable.
+   ```dotenv
+   MUSIC_HOST_PATH=/path/to/your/actual/music/folder
    ```
 
 4. **Start the container:**
@@ -31,7 +30,26 @@ Navikat is a self-hosted web application that fetches music tracks and playlists
    ```
 
 5. **Open Navikat:**
-   Navigate to [http://localhost:3000](http://localhost:3000) in your web browser.
+   Navigate to `http://localhost:<HOST_PORT>` (default [http://localhost:3000](http://localhost:3000)) in your web browser.
+
+---
+
+## ⚙️ Configuration
+
+All configuration lives in `.env`:
+
+| Variable | Required | Description |
+|---|---|---|
+| `HOST_PORT` | No | Port exposed on your host machine (default `3000`). Change this if the port is already taken. |
+| `MUSIC_LIBRARY_PATH` | No | Internal container path for the music library. Leave as `/music` — don't change this. |
+| `MUSIC_HOST_PATH` | Yes | Real path on your host machine to your Navidrome music folder. This is what actually gets mounted into the container. |
+| `MAX_CONCURRENT_DOWNLOADS` | No | How many downloads run in parallel (default `3`). |
+| `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` | No | Needed only to enable Spotify search/import. Get them from the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard). |
+| `ENABLE_AUTH` | No | Set to `true` to password-protect the site (default `false`). |
+| `AUTH_PASSWORD` | If `ENABLE_AUTH=true` | The login password. |
+| `SESSION_SECRET` | If `ENABLE_AUTH=true` | Random secret string used to sign session cookies — change it from the default. |
+| `NAVIDROME_URL` / `NAVIDROME_USER` / `NAVIDROME_PASSWORD` | No | Optional — enables automatic library rescan and playlist creation in Navidrome after downloads finish. |
+| `DEBUG` | No | Set to `true` for verbose logging (default `false`). |
 
 ---
 
@@ -64,3 +82,10 @@ The collapsible corner download queue displays real-time progress bars, track me
 ### Minimalist Login
 ![Login Screen](screenshots/04_login.png)
 
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
+
+Note: Navikat is intended for personal/fair use. Downloading copyrighted music without authorization may violate YouTube's Terms of Service and copyright law in your jurisdiction — use responsibly.
