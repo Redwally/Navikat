@@ -83,9 +83,13 @@ async function parseUrlInput(urlInput, preferredSource = 'deezer') {
   let playlistName = null;
 
   if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
+    const info = await ytdlp.getVideoInfo(url);
     items.push({
       type: 'youtube_video',
-      url: url
+      url,
+      rawTitle: info.title,
+      duration: info.duration,
+      coverUrl: info.thumbnail
     });
     return { playlistName: null, items };
   }
@@ -321,9 +325,18 @@ async function processTrackItem(item, io) {
 
   if (item.type === 'youtube_video') {
     const defaultCover = item.coverUrl || item.cover || (item.url ? ytdlp.getYouTubeThumbnail(item.url) : '');
-    const parsedInfo = canonical.parseYouTubeTitle(item.rawTitle || item.title || '');
-    const displayTitle = item.title || parsedInfo.title || item.rawTitle || item.url;
-    const displayArtist = item.artist || parsedInfo.artist || 'YouTube';
+    const rawTitle = item.rawTitle || item.title || '';
+    const parsedInfo = canonical.parseYouTubeTitle(rawTitle);
+
+    // Use the parsed artist only if it was actually split from the title (not a generic fallback).
+    // When no "Artist - Title" separator is found, parsedInfo.artist is 'Unknown Artist' — don't
+    // pass that into the metadata search; search by cleaned full title instead.
+    const hasRealArtist = item.artist || (parsedInfo.artist && parsedInfo.artist !== 'Unknown Artist');
+    const searchArtist = hasRealArtist ? (item.artist || parsedInfo.artist) : '';
+    const searchTitle = hasRealArtist ? parsedInfo.title : (canonical.cleanYouTubeTitle(rawTitle) || rawTitle);
+
+    const displayTitle = hasRealArtist ? parsedInfo.title : (canonical.cleanYouTubeTitle(rawTitle) || rawTitle || item.url);
+    const displayArtist = hasRealArtist ? (item.artist || parsedInfo.artist) : (canonical.cleanYouTubeTitle(rawTitle) || rawTitle || 'Unknown');
 
     io.emit('queue:progress', {
       jobId,
@@ -336,8 +349,8 @@ async function processTrackItem(item, io) {
 
     const preferredSource = item.preferredSource || 'deezer';
     const match = preferredSource === 'spotify' && spotify.isConfigured()
-      ? await spotify.matchByTitle(displayArtist, displayTitle)
-      : await deezer.matchByTitle(displayArtist, displayTitle);
+      ? await spotify.matchByTitle(searchArtist, searchTitle)
+      : await deezer.matchByTitle(searchArtist, searchTitle);
 
     if (match) {
       canonicalTrack = {
@@ -346,9 +359,9 @@ async function processTrackItem(item, io) {
         coverUrl: match.coverUrl || defaultCover
       };
     } else {
+      // No Deezer/Spotify match — build a canonical track from the YouTube title itself.
       canonicalTrack = canonical.fromYouTubeRaw({
-        title: displayTitle,
-        artist: displayArtist,
+        rawTitle,
         url: item.url,
         duration: item.duration || 0,
         coverUrl: defaultCover

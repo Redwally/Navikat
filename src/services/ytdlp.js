@@ -250,6 +250,23 @@ async function downloadDirectUrl(videoUrl, finalTempMp3Path, onProgress, options
   return videoInfo;
 }
 
+async function getVideoInfo(videoUrl) {
+  try {
+    const { stdout } = await spawnYtDlp(['--dump-json', '--no-playlist', videoUrl]);
+    const info = JSON.parse(stdout.trim());
+    return {
+      title: info.title || '',
+      duration: info.duration || 0,
+      thumbnail: info.thumbnail || getYouTubeThumbnail(videoUrl)
+    };
+  } catch (e) {
+    if (process.env.DEBUG === 'true') {
+      console.warn('[yt-dlp] getVideoInfo failed:', e.message);
+    }
+    return { title: '', duration: 0, thumbnail: getYouTubeThumbnail(videoUrl) };
+  }
+}
+
 function getYouTubeThumbnail(videoIdOrUrl) {
   if (!videoIdOrUrl) return '';
   let id = videoIdOrUrl;
@@ -300,6 +317,7 @@ module.exports = {
   cleanYouTubeTitle,
   parseYouTubeTitle,
   getYouTubeThumbnail,
+  getVideoInfo,
   searchYouTubeCandidates,
   searchAndDownload,
   downloadDirectUrl,
