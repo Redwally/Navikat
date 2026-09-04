@@ -3,9 +3,8 @@ services:
     build: .
     container_name: navikat
     ports:
-      - "3000:3000"
+      - "${HOST_PORT:-3000}:3000"
     environment:
-      - PORT=3000
       - MUSIC_LIBRARY_PATH=/music
       - MAX_CONCURRENT_DOWNLOADS=${MAX_CONCURRENT_DOWNLOADS:-3}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
