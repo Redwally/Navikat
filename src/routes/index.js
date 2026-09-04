@@ -41,6 +41,10 @@ router.post('/login', (req, res) => {
   const { username, password } = req.body || {};
   const expectedPassword = process.env.AUTH_PASSWORD || 'admin';
 
+  if (process.env.DEBUG === 'true') {
+    console.log(`[DEBUG] Login attempt: submitted=${password?.length ?? 0} chars, expected=${expectedPassword.length} chars, match=${password === expectedPassword}`);
+  }
+
   if (password === expectedPassword) {
     req.session.authenticated = true;
     return res.redirect('/');
