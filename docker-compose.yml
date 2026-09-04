@@ -17,5 +17,5 @@ services:
       - NAVIDROME_PASSWORD=${NAVIDROME_PASSWORD:-}
       - DEBUG=${DEBUG:-false}
     volumes:
-      - /path/to/your/music:/music
+      - ${MUSIC_HOST_PATH}:/music
     restart: unless-stopped
