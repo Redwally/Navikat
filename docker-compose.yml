@@ -1,0 +1,22 @@
+services:
+  navikat:
+    build: .
+    container_name: navikat
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MUSIC_LIBRARY_PATH=/music
+      - MAX_CONCURRENT_DOWNLOADS=${MAX_CONCURRENT_DOWNLOADS:-3}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+      - ENABLE_AUTH=${ENABLE_AUTH:-false}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-}
+      - SESSION_SECRET=${SESSION_SECRET:-}
+      - NAVIDROME_URL=${NAVIDROME_URL:-}
+      - NAVIDROME_USER=${NAVIDROME_USER:-}
+      - NAVIDROME_PASSWORD=${NAVIDROME_PASSWORD:-}
+      - DEBUG=${DEBUG:-false}
+    volumes:
+      - /path/to/your/music:/music
+    restart: unless-stopped

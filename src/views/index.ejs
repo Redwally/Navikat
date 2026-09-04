@@ -1,0 +1,70 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <!-- Controls Section: Source Toggle & Search -->
+  <section class="search-section">
+    <div class="search-controls">
+      <div class="source-toggle">
+        <button id="toggle-deezer" class="toggle-pill active" data-source="deezer">
+          <span class="source-dot deezer-dot"></span> Deezer
+        </button>
+        <button id="toggle-spotify" class="toggle-pill <%= !spotifyConfigured ? 'disabled' : '' %>" data-source="spotify" <%= !spotifyConfigured ? 'title="Spotify not configured in .env"' : '' %>>
+          <span class="source-dot spotify-dot"></span> Spotify
+          <% if (!spotifyConfigured) { %><span class="badge-off">Not configured</span><% } %>
+        </button>
+      </div>
+
+      <div class="search-input-wrapper">
+        <input 
+          type="text" 
+          id="search-input" 
+          class="input-brutalist" 
+          placeholder="Search for a track, artist, album..."
+          autocomplete="off"
+          autofocus
+        >
+        <span class="search-spinner" id="search-spinner" style="display: none;"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Direct Link Import Section -->
+  <section class="url-section">
+    <div class="url-card" id="url-card">
+      <h3 class="url-title">🔗 Direct Link Import</h3>
+      <form id="url-form" class="url-form">
+        <div class="url-input-wrapper">
+          <input 
+            type="text" 
+            id="url-input" 
+            class="input-brutalist input-sm" 
+            placeholder="Paste URL or drop a .csv file here..."
+          >
+          <button type="button" id="browse-csv-btn" class="btn-browse-csv" title="Browse .csv file from computer">📁</button>
+        </div>
+        <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none;">
+        <button type="submit" class="btn btn-primary">Add to Queue</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Search Results Section -->
+  <section class="results-section">
+    <div class="section-header">
+      <h2 id="results-title" class="section-title">Popular Tracks</h2>
+      <span id="results-count" class="badge">0 results</span>
+    </div>
+
+    <div id="results-list" class="results-list">
+      <div class="empty-state">
+        <div class="empty-icon">🎵</div>
+        <p>Type an artist or track name to start searching.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Floating Non-Blocking Toast Notifications Overlay -->
+<div id="toast-container" class="toast-container"></div>
+
+<%- include('partials/footer') %>

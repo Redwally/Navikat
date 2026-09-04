@@ -1,0 +1,26 @@
+{
+  "name": "navikat",
+  "version": "1.0.0",
+  "description": "Music Fetcher for Navidrome - Node.js + Express + Socket.io",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["navidrome", "yt-dlp", "music-downloader", "deezer", "spotify", "lyrics"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "node-id3": "^0.2.6",
+    "p-limit": "^3.1.0",
+    "sanitize-filename": "^1.6.3",
+    "socket.io": "^4.8.1",
+    "string-similarity": "^4.0.4"
+  }
+}

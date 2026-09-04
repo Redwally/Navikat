@@ -1,0 +1,9 @@
+node_modules/
+.env
+tmp/
+scratch/
+
+music/
+downloads/
+.DS_Store
+*.log
