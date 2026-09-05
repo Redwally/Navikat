@@ -1,6 +1,11 @@
-# Navikat
+<p align="center">
+  <img src="assets/images/logo.svg" width="300" alt="Navikat logo">
+</p>
+
+# Navikat — Deezer/Spotify/YouTube Music Downloader & Auto-Tagger for Navidrome
 
 Navikat is a self-hosted web application that fetches music tracks and playlists from Deezer, Spotify, YouTube, and CSV exports, downloads high-quality 320kbps audio, and embeds complete metadata, HD covers, and synchronized lyrics directly into your Navidrome music library. It automatically handles file naming, organization, deduplication, and triggers a Navidrome library scan once downloads finish.
+
 
 ---
 
@@ -72,19 +77,19 @@ The collapsible corner download queue displays real-time progress bars, track me
 ## 📸 Screenshots
 
 ### Main Interface & Search
-![Main Screen](screenshots/01_main_screen.png)
+![Main Screen](assets/screenshots/01_main_screen.png)
 
 ### Download Queue Panel
-![Queue Panel](screenshots/02_queue_panel.png)
+![Queue Panel](assets/screenshots/02_queue_panel.png)
 
 ### Unmatched Tracks Review Modal
-![Batch Review](screenshots/03_batch_review.png)
+![Batch Review](assets/screenshots/03_batch_review.png)
 
 ### Minimalist Login
-![Login Screen](screenshots/04_login.png)
+![Login Screen](assets/screenshots/04_login.png)
+---
 
-
-
+### Documentation :
 
 
 **HTTP Routes**
@@ -96,6 +101,7 @@ The collapsible corner download queue displays real-time progress bars, track me
 | POST | `/login` | No | Submit credentials, sets session on match |
 | GET | `/logout` | No | Destroys session |
 
+---
 **Socket.io Events**
 
 | Event | Direction | Payload | Description |
