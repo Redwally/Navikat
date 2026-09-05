@@ -41,6 +41,7 @@ All configuration lives in `.env`:
 | Variable | Required | Description |
 |---|---|---|
 | `HOST_PORT` | No | Port exposed on your host machine (default `3000`). Change this if the port is already taken. |
+| `TRUST_PROXY` | No | Enable (`true`) only if you have login/session issues behind a reverse proxy or tunnel (nginx, Cloudflare Tunnel, Traefik, etc.). Defaults to `false` — test with the default first. |
 | `MUSIC_LIBRARY_PATH` | No | Internal container path for the music library. Leave as `/music` — don't change this. |
 | `MUSIC_HOST_PATH` | Yes | Real path on your host machine to your Navidrome music folder. This is what actually gets mounted into the container. |
 | `MAX_CONCURRENT_DOWNLOADS` | No | How many downloads run in parallel (default `3`). |
