@@ -83,6 +83,46 @@ The collapsible corner download queue displays real-time progress bars, track me
 ### Minimalist Login
 ![Login Screen](screenshots/04_login.png)
 
+
+
+
+
+**HTTP Routes**
+
+| Method | Path | Auth required | Description |
+|---|---|---|---|
+| GET | `/` | Yes (if `ENABLE_AUTH=true`) | Main app page |
+| GET | `/login` | No | Login page |
+| POST | `/login` | No | Submit credentials, sets session on match |
+| GET | `/logout` | No | Destroys session |
+
+**Socket.io Events**
+
+| Event | Direction | Payload | Description |
+|---|---|---|---|
+| `search` | Client → Server | `{ query, source }` | Live search query (Deezer or Spotify) |
+| `search:results` | Server → Client | `{ query, source, results }` | Search results for the query |
+| `search:error` | Server → Client | `{ message }` | Non-fatal search issue (e.g. Spotify not configured, falls back to Deezer) |
+| `queue:add` | Client → Server | `{ item \| url, source }` | Add a single track, URL (video/playlist/album), or playlist to the queue |
+| `queue:add_csv` | Client → Server | `{ csvText, filename, source }` | Import tracks from a dropped/pasted CSV playlist export |
+| `queue:added` | Server → Client | `{ jobId, title, artist, cover }` | A track entered the queue (pending) |
+| `queue:progress` | Server → Client | `{ jobId, title, artist, cover, status, percent, type? }` | Live progress update for a job (fetching metadata, downloading %, tagging, or flagged `type: 'review'`) |
+| `queue:done` | Server → Client | `{ jobId, title, artist, cover, destPath, message }` | Track finished, tagged, and moved into the library |
+| `queue:skipped` | Server → Client | `{ jobId, title, artist, cover, reason }` | Track skipped (duplicate on disk, already processing, or skipped during review) |
+| `queue:error` | Server → Client | `{ jobId, title, artist, cover, error }` | Track failed (bad URL, no tracks found, incomplete metadata, download failure) |
+| `queue:info` | Server → Client | `{ message }` | General non-error status message (e.g. "Analyzing link...", playlist creation status) |
+| `queue:pause` | Client → Server | — | Pause the queue (in-flight downloads finish, new ones wait) |
+| `queue:resume` | Client → Server | — | Resume a paused queue |
+| `queue:state` | Server → Client | `{ isPaused }` | Current pause state (sent on connect and on pause/resume) |
+| `queue:cancel_item` | Client → Server | `{ jobId }` | Cancel one specific job (kills its process, cleans temp files) |
+| `queue:cancel_all` | Client → Server | — | Stop all active/pending jobs and clear the queue |
+| `queue:canceled` | Server → Client | `{ jobId }` | Confirms a specific job was canceled |
+| `queue:canceled_all` | Server → Client | — | Confirms the whole queue was stopped/cleared |
+| `review:submit` | Client → Server | `{ choices: { [jobId]: youtubeUrl \| 'skip' } }` | User's picks from the batch review screen for low-confidence matches |
+| `batch:review_ready` | Server → Client | `{ items: [{ jobId, title, artist, cover, duration, candidates }] }` | Sent once the queue goes idle, if any tracks need manual review |
+| `playlist:import_complete` | Server → Client | `{ playlistName, trackCount, tracks }` | Sent once a playlist import fully finishes, prompting the Navidrome confirmation card |
+| `playlist:create_confirm` | Client → Server | `{ playlistName, tracks }` | User confirmed — create the matching playlist in Navidrome |
+| `playlist:create_skip` | Client → Server | — | User dismissed the playlist creation prompt (no-op) |
 ---
 
 ## 📄 License
