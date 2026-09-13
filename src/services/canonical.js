@@ -189,8 +189,16 @@ function fromSpotifyTrack(track) {
   };
 }
 
-function fromYouTubeRaw({ title: rawTitle, url, duration, coverUrl, thumbnail, artist, title }) {
-  const parsed = parseYouTubeTitle(rawTitle);
+function fromYouTubeRaw({ rawTitle, title: explicitTitle, artist: explicitArtist, url, duration, coverUrl, thumbnail }) {
+  // rawTitle = original YouTube video title (e.g. "Rick Astley - Never Gonna Give You Up")
+  // explicitTitle/explicitArtist = pre-resolved overrides (rare, kept for backwards compat)
+  const sourceTitle = rawTitle || explicitTitle || '';
+
+  if (process.env.DEBUG === 'true') {
+    console.log(`[fromYouTubeRaw] sourceTitle="${sourceTitle}" url=${url}`);
+  }
+
+  const parsed = parseYouTubeTitle(sourceTitle);
   const currentYear = new Date().getFullYear();
 
   let resolvedCover = coverUrl || thumbnail || '';
@@ -201,8 +209,12 @@ function fromYouTubeRaw({ title: rawTitle, url, duration, coverUrl, thumbnail, a
     }
   }
 
-  const finalTitle = title || parsed.title;
-  const finalArtist = artist || parsed.artist;
+  // If parseYouTubeTitle found a real "Artist - Title" split, use both.
+  // Otherwise fall back: title = full cleaned title, artist = full cleaned title (best we have).
+  const cleanedFull = cleanYouTubeTitle(sourceTitle);
+  const hasRealSplit = parsed.artist !== 'Unknown Artist';
+  const finalTitle = explicitTitle || (hasRealSplit ? parsed.title : (cleanedFull || parsed.title || 'Unknown Title'));
+  const finalArtist = explicitArtist || (hasRealSplit ? parsed.artist : (cleanedFull || 'Unknown Artist'));
 
   return {
     title: finalTitle,

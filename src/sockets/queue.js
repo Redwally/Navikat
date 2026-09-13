@@ -2,6 +2,7 @@ const pLimit = require('p-limit');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const axios = require('axios');
 
 const canonical = require('../services/canonical');
 const deezer = require('../services/deezer');
@@ -59,7 +60,7 @@ function sweepTmpDirectory(targetJobId = null) {
           if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   } catch (err) {
@@ -78,9 +79,29 @@ function getItemKey(item) {
 }
 
 async function parseUrlInput(urlInput, preferredSource = 'deezer') {
-  const url = urlInput.trim();
+  let url = urlInput.trim();
   const items = [];
   let playlistName = null;
+
+  // Resolve Deezer short/share links that redirect to the real track/album/playlist URL.
+  if (url.includes('link.deezer.com') || url.includes('deezer.page.link')) {
+    try {
+      const res = await axios.get(url, {
+        maxRedirects: 5,
+        validateStatus: s => s < 400,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      // axios follows redirects automatically; the final URL is in res.request.res.responseUrl
+      const finalUrl = res.request?.res?.responseUrl || res.config?.url || url;
+      if (finalUrl && finalUrl !== url) {
+        url = finalUrl;
+      }
+    } catch (e) {
+      if (process.env.DEBUG === 'true') {
+        console.warn('[Queue] Deezer short-link resolution failed:', e.message);
+      }
+    }
+  }
 
   if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
     const info = await ytdlp.getVideoInfo(url);
@@ -101,8 +122,9 @@ async function parseUrlInput(urlInput, preferredSource = 'deezer') {
       items.push({
         type: 'youtube_video',
         url: v.url,
-        rawTitle: v.title,
-        duration: v.duration
+        rawTitle: v.rawTitle || v.title,  // always use the original raw title, not the pre-parsed one
+        duration: v.duration,
+        coverUrl: v.coverUrl || v.cover
       });
     }
     return { playlistName, items };
@@ -266,14 +288,14 @@ async function resolveCsvRow(rowData, preferredSource) {
     try {
       const track = await deezer.getTrack(rowData.deezerId);
       if (track) return track;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (rowData.spotifyId && spotify.isConfigured()) {
     try {
       const track = await spotify.getTrack(rowData.spotifyId);
       if (track) return track;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (rowData.isrc) {
@@ -326,6 +348,10 @@ async function processTrackItem(item, io) {
   if (item.type === 'youtube_video') {
     const defaultCover = item.coverUrl || item.cover || (item.url ? ytdlp.getYouTubeThumbnail(item.url) : '');
     const rawTitle = item.rawTitle || item.title || '';
+
+    if (process.env.DEBUG === 'true') {
+      console.log(`[processTrackItem] YouTube item — rawTitle="${rawTitle}" url=${item.url}`);
+    }
     const parsedInfo = canonical.parseYouTubeTitle(rawTitle);
 
     // Use the parsed artist only if it was actually split from the title (not a generic fallback).
@@ -600,7 +626,7 @@ function registerQueueHandlers(io, socket) {
   socket.on('queue:cancel_all', () => {
     isQueueCanceledAll = true;
     if (limit.clearQueue) {
-      try { limit.clearQueue(); } catch (e) {}
+      try { limit.clearQueue(); } catch (e) { }
     }
     for (const [jobId, procInfo] of activeProcesses.entries()) {
       if (procInfo && procInfo.child) {
@@ -906,7 +932,7 @@ function registerQueueHandlers(io, socket) {
     }
   });
 
-  socket.on('playlist:create_skip', () => {});
+  socket.on('playlist:create_skip', () => { });
 
   function checkQueueIdle() {
     if (pendingCount === 0) {

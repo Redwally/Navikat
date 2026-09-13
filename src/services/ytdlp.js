@@ -126,7 +126,7 @@ async function searchYouTubeCandidates(artist, title) {
             thumbnail: item.thumbnail || (item.thumbnails && item.thumbnails.length > 0 ? item.thumbnails[0].url : '')
           });
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   } catch (err) {
     if (process.env.DEBUG === 'true') {
@@ -151,7 +151,7 @@ async function searchAndDownload(artist, title, expectedDurationSec, finalTempMp
       err.candidates = candidates;
       throw err;
     }
-    
+
     candidates.sort((a, b) => {
       const diffA = Math.abs(a.duration - expectedDurationSec);
       const diffB = Math.abs(b.duration - expectedDurationSec);
@@ -199,7 +199,7 @@ async function searchAndDownload(artist, title, expectedDurationSec, finalTempMp
       }
       lastError = err;
       if (fs.existsSync(rawTempPath)) {
-        try { fs.unlinkSync(rawTempPath); } catch (e) {}
+        try { fs.unlinkSync(rawTempPath); } catch (e) { }
       }
     }
   }
@@ -308,7 +308,7 @@ async function getPlaylistVideos(playlistUrl) {
           duration: parsed.duration || 0
         });
       }
-    } catch (e) {}
+    } catch (e) { }
   }
   return { playlistName, tracks: items };
 }
