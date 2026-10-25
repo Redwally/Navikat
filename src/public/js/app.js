@@ -848,7 +848,42 @@
       .replace(/'/g, '&#039;');
   }
 
+  // ==========================================
+  // THEME TOGGLE (BRUTALIST <-> LIQUID GLASS)
+  // ==========================================
+  function initThemeToggle() {
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (!themeBtn) return;
+
+    function syncThemeButton() {
+      const isLiquid = document.documentElement.getAttribute('data-theme') === 'liquid-glass';
+      const icon = themeBtn.querySelector('.theme-toggle-icon');
+      const label = themeBtn.querySelector('.theme-toggle-label');
+      if (icon) icon.textContent = isLiquid ? '🏛️' : '🫧';
+      if (label) label.textContent = isLiquid ? 'Brutalist' : 'Liquid Glass';
+      themeBtn.setAttribute('title', isLiquid ? 'Switch to Brutalist theme' : 'Switch to Liquid Glass theme');
+      themeBtn.classList.toggle('theme-active-liquid', isLiquid);
+    }
+
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      if (current === 'liquid-glass') {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('navikat_theme', 'brutalist'); } catch(e) {}
+      } else {
+        document.documentElement.setAttribute('data-theme', 'liquid-glass');
+        try { localStorage.setItem('navikat_theme', 'liquid-glass'); } catch(e) {}
+      }
+      syncThemeButton();
+    });
+
+    syncThemeButton();
+  }
+
   // Initial search
   triggerSearch();
+
+  // Initialize theme switcher
+  initThemeToggle();
 
 })();

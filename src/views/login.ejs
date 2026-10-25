@@ -2,14 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Login — Navikat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('navikat_theme');
+        if (theme === 'liquid-glass') {
+          document.documentElement.setAttribute('data-theme', 'liquid-glass');
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body class="login-page-body">
+  <div class="login-top-bar">
+    <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-label="Toggle visual theme" title="Switch between Brutalist and Liquid Glass themes">
+      <span class="theme-toggle-icon">🫧</span>
+      <span class="theme-toggle-label">Liquid Glass</span>
+    </button>
+  </div>
+
   <div class="login-container">
     <div class="login-profile-avatar">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -51,5 +68,30 @@
       <button type="submit" class="btn btn-primary btn-block">Login</button>
     </form>
   </div>
+
+  <script>
+    (function() {
+      const btn = document.getElementById('theme-toggle-btn');
+      if (!btn) return;
+      function updateButton() {
+        const isLiquid = document.documentElement.getAttribute('data-theme') === 'liquid-glass';
+        btn.querySelector('.theme-toggle-icon').textContent = isLiquid ? '🏛️' : '🫧';
+        btn.querySelector('.theme-toggle-label').textContent = isLiquid ? 'Brutalist' : 'Liquid Glass';
+        btn.classList.toggle('theme-active-liquid', isLiquid);
+      }
+      btn.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        if (current === 'liquid-glass') {
+          document.documentElement.removeAttribute('data-theme');
+          try { localStorage.setItem('navikat_theme', 'brutalist'); } catch(e) {}
+        } else {
+          document.documentElement.setAttribute('data-theme', 'liquid-glass');
+          try { localStorage.setItem('navikat_theme', 'liquid-glass'); } catch(e) {}
+        }
+        updateButton();
+      });
+      updateButton();
+    })();
+  </script>
 </body>
 </html>
