@@ -101,8 +101,8 @@ function parseYouTubeTitle(rawTitle) {
   };
 }
 
-async function convertToMp3Cbr(inputPath, outputPath) {
-  const cmd = `ffmpeg -y -i "${inputPath}" -vn -c:a libmp3lame -b:a 320k "${outputPath}"`;
+async function convertToMp3(inputPath, outputPath) {
+  const cmd = `ffmpeg -y -i "${inputPath}" -vn -c:a libmp3lame -q:a 0 "${outputPath}"`;
   await execAsync(cmd, { maxBuffer: 10 * 1024 * 1024 });
 }
 
@@ -164,7 +164,7 @@ async function searchAndDownload(artist, title, expectedDurationSec, finalTempMp
 
   for (const candidate of candidates) {
     try {
-      const downloadArgs = ['-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, candidate.url];
+      const downloadArgs = ['-f', 'bestaudio', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, candidate.url];
       await spawnYtDlp(downloadArgs, onProgress, options);
 
       let downloadedFile = rawTempPath;
@@ -181,7 +181,7 @@ async function searchAndDownload(artist, title, expectedDurationSec, finalTempMp
         throw new Error('Downloaded raw audio file not found');
       }
 
-      await convertToMp3Cbr(downloadedFile, finalTempMp3Path);
+      await convertToMp3(downloadedFile, finalTempMp3Path);
 
       if (fs.existsSync(downloadedFile)) {
         fs.unlinkSync(downloadedFile);
@@ -224,7 +224,7 @@ async function downloadDirectUrl(videoUrl, finalTempMp3Path, onProgress, options
     }
   }
 
-  const downloadArgs = ['-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, videoUrl];
+  const downloadArgs = ['-f', 'bestaudio', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, videoUrl];
   await spawnYtDlp(downloadArgs, onProgress, options);
 
   let downloadedFile = rawTempPath;
@@ -241,7 +241,7 @@ async function downloadDirectUrl(videoUrl, finalTempMp3Path, onProgress, options
     throw new Error('Direct YouTube audio download failed');
   }
 
-  await convertToMp3Cbr(downloadedFile, finalTempMp3Path);
+  await convertToMp3(downloadedFile, finalTempMp3Path);
 
   if (fs.existsSync(downloadedFile)) {
     fs.unlinkSync(downloadedFile);

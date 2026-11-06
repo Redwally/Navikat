@@ -4,8 +4,19 @@
 
 # Navikat — Deezer/Spotify/YouTube Music Downloader & Auto-Tagger for Navidrome
 
-Navikat is a self-hosted web application that fetches music tracks and playlists from Deezer, Spotify, YouTube, and CSV exports, downloads high-quality 320kbps audio, and embeds complete metadata, HD covers, and synchronized lyrics directly into your Navidrome music library. It automatically handles file naming, organization, deduplication, and triggers a Navidrome library scan once downloads finish.
+Navikat is a self-hosted web application that fetches music tracks and playlists from Deezer, Spotify, YouTube, and CSV exports, downloads the best available YouTube audio (typically ~128–160 kbps Opus/AAC) converted to high-quality MP3 (VBR ~V0), and embeds complete metadata, HD covers, and synchronized lyrics directly into your Navidrome music library. It automatically handles file naming, organization, deduplication, and triggers a Navidrome library scan once downloads finish.
 
+> **Audio Quality Note**: YouTube source streams are capped at ~128–160 kbps (Opus or AAC). Encoding to MP3 320 kbps CBR does not add fidelity; it only wastes storage. Navikat downloads using `yt-dlp -f bestaudio` and performs a lossy-to-lossy conversion to MP3 with high-quality variable bitrate (`-q:a 0`, ~V0) to ensure maximum compatibility with ID3 tags, embedded synced lyrics (USLT/SYLT), and player devices without bloating file sizes.
+
+
+## ✨ Features
+
+- **Multi-Source Search & Import:** Search tracks on Deezer (or Spotify), import via direct YouTube link, batch download Deezer/Spotify/YouTube playlists or albums, or drag-and-drop CSV exports.
+- **Honest Audio Quality:** Downloads the best available YouTube source stream (`yt-dlp -f bestaudio`, typically ~128–160 kbps Opus/AAC) converted to high-quality variable bitrate MP3 (`-q:a 0`, ~V0) without fake upsampling.
+- **Rich Metadata & Synced Lyrics:** Automatically tags files with full ID3v2.3 tags, embeds high-resolution cover art, and includes synchronized syllable/line lyrics (SYLT and USLT).
+- **Collapsible Queue Panel:** Live progress updates, pause/resume controls, cancellation, and dark/light & Liquid Glass glassmorphism themes.
+- **Unmatched Review Modal:** Interactive candidate picker for low-confidence audio matches during playlist imports.
+- **Navidrome Integration:** Automatic library scans and 1-click Navidrome playlist creation upon download completion.
 
 ---
 
@@ -61,8 +72,8 @@ All configuration lives in `.env`:
 
 ## 📥 Import Methods
 
-- **Search:** Use the main search bar to search across millions of tracks on Deezer (or Spotify when configured). Click the `+` button on any track result to fetch metadata, lyrics, and start downloading immediately.
-- **YouTube Link:** Paste a direct YouTube video URL into the direct import field to download that specific audio stream. Navikat automatically cleans video titles, fetches matched HD covers and metadata, and embeds synchronized lyrics.
+- **Search:** Use the main search bar to search across millions of tracks on Deezer (or Spotify when configured). Click the `+` button on any track result to fetch metadata, lyrics, and download the best available YouTube audio stream (~128–160 kbps converted to MP3 VBR).
+- **YouTube Link:** Paste a direct YouTube video URL into the direct import field to download the best audio stream. Navikat automatically cleans video titles, fetches matched HD covers and metadata, and embeds synchronized lyrics.
 - **Playlist Link:** Paste a Deezer, Spotify, or YouTube playlist/album URL into the import box to batch-enqueue every track in the playlist with concurrent download management and deduplication against your library.
 - **CSV Import:** Drag and drop a `.csv` playlist export (from TuneMyMusic, Spotify, or Deezer) directly onto the import input area or click the 📁 button to browse. Navikat parses the tracks, prioritizes exact platform IDs and ISRC codes, and enqueues all matched songs automatically.
 

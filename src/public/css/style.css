@@ -1916,7 +1916,7 @@ h1, h2, h3, h4, h5, h6 {
    ========================================================================== */
 
 [data-theme="liquid-glass"] .queue-panel {
-  background: rgba(10, 14, 28, 0.76);
+  background: rgba(10, 14, 28, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-top: 1px solid rgba(255, 255, 255, 0.38);
   border-radius: 28px;
@@ -1930,6 +1930,10 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
 }
 
+[data-theme="liquid-glass"] .queue-panel::before {
+  pointer-events: none;
+}
+
 [data-theme="liquid-glass"] .queue-panel-header {
   background: rgba(255, 255, 255, 0.06);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -1937,10 +1941,16 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-backdrop-filter: blur(16px);
   color: #FFFFFF;
   position: relative;
-  z-index: 2;
+  z-index: 3;
+}
+
+[data-theme="liquid-glass"] .queue-panel-body {
+  position: relative;
+  z-index: 3;
 }
 
 [data-theme="liquid-glass"] .queue-row {
+  position: relative;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1960,6 +1970,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
 }
 
 [data-theme="liquid-glass"] .queue-row-title {
@@ -1970,16 +1981,39 @@ h1, h2, h3, h4, h5, h6 {
   color: #CBD5E1;
 }
 
+[data-theme="liquid-glass"] .queue-row-status {
+  color: #CBD5E1;
+}
+
+[data-theme="liquid-glass"] .queue-status-progress {
+  color: #38bdf8 !important;
+}
+
+[data-theme="liquid-glass"] .queue-status-done {
+  color: #34d399 !important;
+}
+
+[data-theme="liquid-glass"] .queue-status-error {
+  color: #f87171 !important;
+}
+
+[data-theme="liquid-glass"] .queue-status-skipped {
+  color: #fbbf24 !important;
+}
+
 [data-theme="liquid-glass"] .queue-row-bar-wrap {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="liquid-glass"] .queue-row-bar-fill {
   background: linear-gradient(90deg, #38bdf8, #818cf8);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
 }
 
 [data-theme="liquid-glass"] .queue-row-done .queue-row-bar-fill {
   background: linear-gradient(90deg, #34d399, #10b981) !important;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
 }
 
 [data-theme="liquid-glass"] .queue-row-cancel-btn {
@@ -1987,6 +2021,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: #CBD5E1;
   border-radius: 8px;
+  position: relative;
+  z-index: 2;
 }
 
 [data-theme="liquid-glass"] .queue-row-cancel-btn:hover {
