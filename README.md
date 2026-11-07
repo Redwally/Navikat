@@ -142,6 +142,14 @@ The collapsible corner download queue displays real-time progress bars, track me
 | `playlist:create_skip` | Client → Server | — | User dismissed the playlist creation prompt (no-op) |
 ---
 
+## 🛠️ Requirements & Troubleshooting
+
+- **Node.js & yt-dlp dependencies**: YouTube challenge solving (signatures and `n` challenges) requires **Node.js >= 22** as a JavaScript runtime and the `yt-dlp-ejs` solver plugin (included automatically when installing `yt-dlp[default]`).
+- **Running in Docker**: Ensure you rebuild your container after updating (`docker compose up -d --build`) so the base image is updated to Node 22 (`node:22-slim`) with `"yt-dlp[default]"`.
+- **Running locally without Docker**: Make sure you have Node >= 22 installed, ffmpeg in PATH, and run `pip install -U "yt-dlp[default]"` to pull in required YouTube challenge solvers.
+
+---
+
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE).

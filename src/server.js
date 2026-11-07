@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const routes = require('./routes');
 const { registerSearchHandlers } = require('./sockets/search');
 const { registerQueueHandlers } = require('./sockets/queue');
+const { runDiagnostics } = require('./services/ytdlp');
 
 const app = express();
 const server = http.createServer(app);
@@ -69,7 +70,7 @@ io.on('connection', (socket) => {
 
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`Navikat running on http://localhost:${PORT} (Music: ${process.env.MUSIC_LIBRARY_PATH || '/music'}, Auth: ${process.env.ENABLE_AUTH === 'true'})`);
   if (process.env.DEBUG === 'true') {
     const authPwd = process.env.AUTH_PASSWORD;
@@ -78,4 +79,5 @@ server.listen(PORT, () => {
     console.log(`[DEBUG] AUTH_PASSWORD: ${authPwd ? `set (${authPwd.length} chars)` : 'NOT SET / EMPTY'}`);
     console.log(`[DEBUG] SESSION_SECRET: ${sessionSecret ? `set (${sessionSecret.length} chars)` : 'NOT SET / EMPTY'}`);
   }
+  await runDiagnostics();
 });

@@ -1,7 +1,7 @@
-FROM node:20-slim
+FROM node:22-slim
 
 RUN apt-get update && apt-get install -y ffmpeg python3 python3-pip curl \
-    && pip install -U yt-dlp --break-system-packages \
+    && pip install -U "yt-dlp[default]" --break-system-packages \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

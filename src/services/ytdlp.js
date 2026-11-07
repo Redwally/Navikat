@@ -5,10 +5,15 @@ const fs = require('fs');
 
 const execAsync = util.promisify(exec);
 
+const SHARED_YT_DLP_ARGS = ['--js-runtimes', 'node', '--newline'];
+
 function spawnYtDlp(argsArray, onProgress, options = {}) {
   return new Promise((resolve, reject) => {
-    const extractorArgs = ['--extractor-args', 'youtube:player_client=ios,mweb,web,android', '--newline'];
-    const fullArgs = [...extractorArgs, ...argsArray];
+    const fullArgs = [...SHARED_YT_DLP_ARGS, ...argsArray];
+
+    if (process.env.DEBUG === 'true') {
+      console.log('[yt-dlp] Command arguments:', fullArgs);
+    }
 
     let stdoutData = '';
     let stderrData = '';
@@ -164,7 +169,7 @@ async function searchAndDownload(artist, title, expectedDurationSec, finalTempMp
 
   for (const candidate of candidates) {
     try {
-      const downloadArgs = ['-f', 'bestaudio', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, candidate.url];
+      const downloadArgs = ['-f', 'bestaudio/best', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, candidate.url];
       await spawnYtDlp(downloadArgs, onProgress, options);
 
       let downloadedFile = rawTempPath;
@@ -224,7 +229,7 @@ async function downloadDirectUrl(videoUrl, finalTempMp3Path, onProgress, options
     }
   }
 
-  const downloadArgs = ['-f', 'bestaudio', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, videoUrl];
+  const downloadArgs = ['-f', 'bestaudio/best', '-x', '--audio-format', 'mp3', '--audio-quality', '0', '-o', rawTempPath, videoUrl];
   await spawnYtDlp(downloadArgs, onProgress, options);
 
   let downloadedFile = rawTempPath;
@@ -313,7 +318,40 @@ async function getPlaylistVideos(playlistUrl) {
   return { playlistName, tracks: items };
 }
 
+async function runDiagnostics() {
+  console.log(`[Diagnostics] Node version: ${process.version}`);
+  const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+  if (isNaN(nodeMajor) || nodeMajor < 22) {
+    console.warn('⚠️  [Diagnostics] WARNING: yt-dlp needs Node >= 22 for YouTube challenges. Current version is ' + process.version);
+  }
+
+  try {
+    const { stdout } = await execAsync('yt-dlp --version');
+    console.log(`[Diagnostics] yt-dlp version: ${stdout.trim()}`);
+  } catch (err) {
+    try {
+      const { stdout: pyStdout } = await execAsync('python -m yt_dlp --version');
+      console.log(`[Diagnostics] yt-dlp (python) version: ${pyStdout.trim()}`);
+    } catch (e) {
+      console.warn('⚠️  [Diagnostics] WARNING: yt-dlp is not accessible in PATH or python.');
+    }
+  }
+
+  try {
+    const { stdout } = await execAsync('pip show yt-dlp-ejs');
+    if (stdout.includes('Name: yt-dlp-ejs') || stdout.includes('Version:')) {
+      const versionLine = stdout.split('\n').find(l => l.startsWith('Version:')) || '';
+      console.log(`[Diagnostics] yt-dlp-ejs installed: ${versionLine.trim() || 'yes'}`);
+    } else {
+      console.warn('⚠️  [Diagnostics] WARNING: yt-dlp-ejs not detected. YouTube challenges may fail.');
+    }
+  } catch (err) {
+    console.warn('⚠️  [Diagnostics] WARNING: yt-dlp-ejs is missing (pip show yt-dlp-ejs failed). YouTube challenges may fail without yt-dlp[default].');
+  }
+}
+
 module.exports = {
+  runDiagnostics,
   cleanYouTubeTitle,
   parseYouTubeTitle,
   getYouTubeThumbnail,

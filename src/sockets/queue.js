@@ -570,7 +570,7 @@ async function processTrackItem(item, io) {
       title,
       artist,
       cover: canonicalTrack.coverUrl || '',
-      error: `Download failed: ${err.message}`
+      error: 'YouTube download failed, check the yt-dlp/JS runtime setup'
     });
   }
 }
