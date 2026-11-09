@@ -8,6 +8,14 @@ function authMiddleware(req, res, next) {
   if (!enableAuth) {
     return next();
   }
+  // Allow PWA assets without auth
+  if (
+    req.path === '/sw.js' ||
+    req.path === '/manifest.webmanifest' ||
+    req.path.startsWith('/icons/')
+  ) {
+    return next();
+  }
   if (req.session && req.session.authenticated) {
     return next();
   }

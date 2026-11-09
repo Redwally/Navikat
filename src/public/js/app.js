@@ -863,6 +863,11 @@
       if (label) label.textContent = isLiquid ? 'Brutalist' : 'Liquid Glass';
       themeBtn.setAttribute('title', isLiquid ? 'Switch to Brutalist theme' : 'Switch to Liquid Glass theme');
       themeBtn.classList.toggle('theme-active-liquid', isLiquid);
+
+      const metaTheme = document.getElementById('meta-theme-color');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', isLiquid ? '#dfe4ec' : '#F97316');
+      }
     }
 
     themeBtn.addEventListener('click', () => {
@@ -880,10 +885,76 @@
     syncThemeButton();
   }
 
+  // ==========================================
+  // PWA SERVICE WORKER & INSTALL PROMPT
+  // ==========================================
+  function initPWA() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.warn('[PWA] ServiceWorker registration failed:', err);
+        });
+      });
+    }
+
+    const installBtn = document.getElementById('pwa-install-btn');
+    let deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installBtn && !window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) {
+          // iOS Safari detection or fallback
+          const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+          if (isIos) {
+            showAlertToast('Sur iOS: appuyez sur Partager puis "Sur l\'écran d\'accueil"', 'info', 7000);
+          }
+          return;
+        }
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+      });
+    }
+
+    // On iOS where beforeinstallprompt doesn't fire, show a subtle prompt once if not standalone
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    if (isIos && !isStandalone && installBtn) {
+      try {
+        const hinted = localStorage.getItem('navikat_ios_pwa_hint');
+        if (!hinted) {
+          installBtn.style.display = 'inline-flex';
+          installBtn.textContent = '📲 Add to Home';
+          localStorage.setItem('navikat_ios_pwa_hint', 'true');
+        }
+      } catch(e) {}
+    }
+
+    window.addEventListener('appinstalled', () => {
+      if (installBtn) installBtn.style.display = 'none';
+      deferredPrompt = null;
+      showAlertToast('Navikat app installed successfully!', 'done', 4000);
+    });
+  }
+
   // Initial search
   triggerSearch();
 
   // Initialize theme switcher
   initThemeToggle();
+
+  // Initialize PWA
+  initPWA();
 
 })();

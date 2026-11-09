@@ -142,6 +142,15 @@ The collapsible corner download queue displays real-time progress bars, track me
 | `playlist:create_skip` | Client → Server | — | User dismissed the playlist creation prompt (no-op) |
 ---
 
+## 📱 Install as an App (PWA)
+
+Navikat can be installed as a standalone progressive web application directly from your browser:
+- **HTTPS Requirement**: PWA features and Service Workers require HTTPS (or `localhost`), provided seamlessly when using a Cloudflare Tunnel or reverse proxy.
+- **Android / Chrome / Edge**: Click the **📲 Install App** button in the top navigation bar, or select **Install app** from the browser menu.
+- **iOS (Safari)**: Tap the **Share** button (square with arrow pointing up) at the bottom of Safari, then choose **"Add to Home Screen"** (**"Sur l'écran d'accueil"**).
+
+---
+
 ## 🛠️ Requirements & Troubleshooting
 
 - **Node.js & yt-dlp dependencies**: YouTube challenge solving (signatures and `n` challenges) requires **Node.js >= 22** as a JavaScript runtime and the `yt-dlp-ejs` solver plugin (included automatically when installing `yt-dlp[default]`).

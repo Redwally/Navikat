@@ -7,7 +7,14 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
-  "keywords": ["navidrome", "yt-dlp", "music-downloader", "deezer", "spotify", "lyrics"],
+  "keywords": [
+    "navidrome",
+    "yt-dlp",
+    "music-downloader",
+    "deezer",
+    "spotify",
+    "lyrics"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
